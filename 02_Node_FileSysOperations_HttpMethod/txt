@@ -1,0 +1,8 @@
+npm init -> package.json -> details of the project
+
+File System Operations
+ . writefile
+ . appendfile
+ . copyfile
+ . rename
+ . unlink
