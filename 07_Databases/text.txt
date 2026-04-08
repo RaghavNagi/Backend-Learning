@@ -1,0 +1,29 @@
+Data Storage:
+    aisa kuch jaha par hum saare user ki info store krr skte hai
+
+types of DBS
+    - SQL
+    - NoSQL
+SQL - data ko eek roop mein rakhna - tables
+NoSQL - {}
+
+what and why
+terminologies - collections, documents, schemas, keys, models
+
+There are 2 server in backend
+- application server (nodejs)
+- database server (mongodb)
+
+Database -> Collection -> Document
+
+CODE
+---------------
+
+
+
+
+CODE                DATABASE
+----------------------------------------------------------
+mongoose.connect -> database create
+model create     -> collection
+CREATE CODE      -> document
