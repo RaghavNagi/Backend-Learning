@@ -19,9 +19,20 @@ app.get("/",(req,res)=>{
     res.render('index');
 })
 
-app.get("/profile",isLoggedIn,(req,res)=>{
-    console.log(req.user);
-    res.render('profile');
+app.get("/profile",isLoggedIn,async (req,res)=>{
+    let user = await userModel.findOne({email: req.user.email}).populate("posts")
+    res.render('profile', {user});
+})
+
+app.post("/post",isLoggedIn,async (req,res)=>{
+    let user = await userModel.findOne({email: req.user.email})
+    let post = await postModel.create({
+        user: user._id,
+        content: req.body.content
+    })
+    user.posts.push(post._id)
+    await user.save()
+    res.redirect('/profile')
 })
 
 
@@ -34,7 +45,7 @@ app.post("/register",async (req,res)=>{
 
     bcrypt.genSalt(10, (err,salt)=>{
         bcrypt.hash(password, salt,async (err,hash)=>{
-            let user = await userModel.Create({
+            let user = await userModel.create({
                 username,
                 name,
                 age,
@@ -44,7 +55,7 @@ app.post("/register",async (req,res)=>{
 
             let token = jwt.sign({email: email, userid: user._id}, "dotenv_secret_key")
             res.cookie("token",token)
-            res.send("registered")
+            res.redirect("/profile")
         })
     })
 })
@@ -60,11 +71,15 @@ app.post("/login",async (req,res)=>{
         if (result){
             let token = jwt.sign({email: email, userid:user._id},"dotenv_secret_key")
             res.cookie("token",token)
-            res.status(200).send("you can login")
+            res.status(200).redirect("/profile")
         }
         else {res.redirect('/login')}
     })
 })
+
+app.get("/login", (req, res) => {
+    res.render("login");
+});
 
 app.get("/logout",(req,res)=>{
     res.cookie("token","")
@@ -73,7 +88,7 @@ app.get("/logout",(req,res)=>{
 
 function isLoggedIn(req,res,next){
     if (req.cookies.token === ""){
-        res.send("You must be logged in")
+        res.redirect("/login")
     }
     else{
         let data = jwt.verify(req.cookies.token,"dotenv_secret_key")
